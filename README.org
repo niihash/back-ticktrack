@@ -1,0 +1,169 @@
+#+OPTIONS: toc:3 num:t
+
+* About
+
+Multi-tenant SaaS API for employee time tracking built with:
+
+- Laravel
+- Stancl Tenancy
+- Sanctum
+- Spatie Laravel Permission
+- SQLite
+
+Features:
+
+- Multi-tenant architecture
+- Subdomain-based tenants
+- Employee management
+- Work schedules
+- Time entries
+- Notifications
+- RBAC (Roles & Permissions)
+- REST API
+
+* Tech Stack
+
+- PHP 8.5+
+- Laravel 13
+- SQLite
+- Stancl Tenancy
+- Laravel Sanctum
+- Spatie Laravel Permission
+
+* Requirements
+
+Before starting, make sure you have installed:
+
+- PHP 8.5+
+- Composer
+- MySQL
+- Node.js
+- NPM
+- Git
+
+* Clone Repository
+
+#+begin_src bash
+git clone https://github.com/niihash/back-ticktrack.git
+
+cd back-ticktrack
+#+end_src
+
+* Install Dependencies
+
+** PHP Dependencies
+
+#+begin_src bash
+composer install
+#+end_src
+
+** Frontend Dependencies
+
+#+begin_src bash
+npm install
+#+end_src
+
+* Environment Configuration
+
+Copy the example environment file:
+
+#+begin_src bash
+cp .env.example .env
+#+end_src
+
+Generate application key:
+
+#+begin_src bash
+php artisan key:generate
+#+end_src
+
+* Configure Local Domains
+
+Add the following entries to your hosts file.
+
+Linux/macOS:
+
+#+begin_src bash
+sudo nano /etc/hosts
+#+end_src
+
+Windows:
+
+#+begin_src text
+C:\Windows\System32\drivers\etc\hosts
+#+end_src
+
+Add:
+
+#+begin_src text
+127.0.0.1 example.test
+#+end_src
+
+You can create additional tenant subdomains as needed.
+
+#+begin_src text
+127.0.0.1 alphacorp.example.test
+127.0.0.1 betacorp.example.test
+127.0.0.1 charliecorp.example.test
+127.0.0.1 deltacorp.example.test
+#+end_src
+
+* Run Migrations
+
+** Central Database
+
+#+begin_src bash
+php artisan migrate
+#+end_src
+
+** Tenant Migrations
+
+#+begin_src bash
+php artisan tenants:migrate
+#+end_src
+
+* Run Development Server
+
+#+begin_src bash
+php artisan serve --host=0.0.0.0 --port=8000
+#+end_src
+
+Application will be available at:
+
+#+begin_src text
+http://example.test:8000
+#+end_src
+
+* Register a Tenant
+
+Example request:
+
+#+begin_src bash
+curl --request POST \
+  --url http://example.test:8000/api/register \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password",
+    "password_confirmation": "password",
+    "subdomain": "alpha"
+}'
+#+end_src
+
+Expected response:
+
+#+begin_src json
+{
+  "message": "Tenant created successfully",
+  "tenant_url": "http://alpha.example.test"
+}
+#+end_src
+
+* Tenant API Access
+
+Example tenant URL:
+
+#+begin_src text
+http://alpha.example.test:8000
+#+end_src
