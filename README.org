@@ -167,3 +167,122 @@ Example tenant URL:
 #+begin_src text
 http://alpha.example.test:8000
 #+end_src
+
+* SPA Authentication (Laravel Sanctum)
+
+This API uses Laravel Sanctum with cookie-based authentication.
+
+Frontend applications must:
+
+- send credentials/cookies
+- initialize CSRF protection
+- use the correct headers
+
+* Authentication Flow
+
+1. Request CSRF cookie
+2. Login
+3. Perform authenticated requests
+
+* CSRF Cookie
+
+Before login, the frontend MUST call:
+
+#+begin_src text
+GET /sanctum/csrf-cookie
+#+end_src
+
+Example:
+
+#+begin_src javascript
+await fetch('http://example.test:8000/sanctum/csrf-cookie', {
+  credentials: 'include',
+});
+#+end_src
+
+This endpoint initializes:
+
+- XSRF-TOKEN cookie
+- Laravel session cookie
+
+* Login Request
+
+After fetching the CSRF cookie:
+
+#+begin_src javascript
+await fetch('http://example.test:8000/api/login', {
+  method: 'POST',
+
+  credentials: 'include',
+
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+
+  body: JSON.stringify({
+    email: 'john@example.com',
+    password: 'password',
+  }),
+});
+#+end_src
+
+* Authenticated Requests
+
+All authenticated requests MUST include:
+
+#+begin_src javascript
+credentials: 'include'
+#+end_src
+
+Example:
+
+#+begin_src javascript
+await fetch('http://acme.example.test:8000/api/user', {
+  credentials: 'include',
+
+  headers: {
+    'Accept': 'application/json',
+  },
+});
+#+end_src
+
+* Required Frontend Configuration
+
+If using Axios:
+
+#+begin_src javascript
+import axios from 'axios';
+
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+
+axios.defaults.headers.common['Accept'] = 'application/json';
+#+end_src
+
+* Common Issues
+
+** 419 Page Expired
+
+Usually caused by:
+
+- missing CSRF cookie request
+- missing credentials: include
+- invalid SESSION_DOMAIN
+- incorrect SANCTUM_STATEFUL_DOMAINS
+
+** CORS Errors
+
+Make sure:
+
+- supports_credentials is enabled
+- frontend origin is allowed
+- frontend sends credentials
+
+** Unauthenticated
+
+Make sure the request includes:
+
+#+begin_src javascript
+credentials: 'include'
+#+end_src
