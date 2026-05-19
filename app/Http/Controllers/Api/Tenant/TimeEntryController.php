@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TimeEntryResource;
 use App\Models\TimeEntry;
 use App\Models\TimeEntryLog;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class TimeEntryController extends Controller
             $query->whereDate('recorded_at', '<=', $request->end_date);
         }
 
-        return response()->json($query->orderBy('recorded_at', 'desc')->paginate());
+        return TimeEntryResource::collection($query->orderBy('record_at', 'desc'));
     }
 
     /**
@@ -56,7 +57,7 @@ class TimeEntryController extends Controller
             'changed_by' => Auth::id(),
         ]);
 
-        return response()->json($timeEntry, 201);
+        return new TimeEntryResource($timeEntry);
     }
 
     /**
@@ -64,7 +65,7 @@ class TimeEntryController extends Controller
      */
     public function show(TimeEntry $timeEntry)
     {
-        return response()->json($timeEntry->load(['employee', 'logs']));
+        return new TimeEntryResource($timeEntry->load(['employee', 'logs']));
     }
 
     /**
@@ -92,7 +93,7 @@ class TimeEntryController extends Controller
             'changed_by' => Auth::id(),
         ]);
 
-        return response()->json($timeEntry);
+        return new TimeEntryResource($timeEntry);
     }
 
     /**
