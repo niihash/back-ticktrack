@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\WorkScheduleResource;
 use App\Models\WorkSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ class WorkScheduleController extends Controller
      */
     public function index()
     {
-        return response()->json(WorkSchedule::with('days'));
+        return WorkScheduleResource::collection(WorkSchedule::with('workScheduleDays'));
     }
 
     /**
@@ -54,7 +55,8 @@ class WorkScheduleController extends Controller
 
             DB::commit();
 
-            return response()->json($workSchedule->load('days'), 201);
+            return new WorkScheduleResource($workSchedule->load('workScheduleDays'));
+            //return response()->json($workSchedule->load('workScheduleDays'), 201);
         } catch (\Throwable $e) {
 
             DB::rollBack();
@@ -68,7 +70,8 @@ class WorkScheduleController extends Controller
      */
     public function show(WorkSchedule $workSchedule)
     {
-        return response()->json($workSchedule->load('days'));
+        return new WorkScheduleResource($workSchedule->load('workScheduleDays'));
+        //return response()->json($workSchedule->load('workScheduleDays'));
     }
 
     /**
@@ -110,7 +113,8 @@ class WorkScheduleController extends Controller
 
             DB::commit();
 
-            return response()->json($workSchedule->load('days'));
+            return new WorkScheduleResource($workSchedule->load('workScheduleDays'));
+            //return response()->json($workSchedule->load('workScheduleDays'));
         } catch (\Throwable $e) {
 
             DB::rollBack();
@@ -124,7 +128,7 @@ class WorkScheduleController extends Controller
      */
     public function destroy(WorkSchedule $workSchedule)
     {
-        if ($workSchedule->employees()->exists()) {
+        if (!$workSchedule->employees()->exists()) {
             $workSchedule->delete();
 
             return response()->noContent();
