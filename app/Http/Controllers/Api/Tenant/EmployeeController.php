@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,7 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        return response()->json(Employee::with(['user', 'workSchedule']));
+        return EmployeeResource::collection(Employee::with(['user', 'workSchedule']));
     }
 
     /**
@@ -22,19 +23,19 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => ['required', 'exists:user,id'],
+            'user_id' => ['required', 'exists:users,id'],
             'name' => ['required', 'string'],
             'cpf' => ['required', 'string'],
-            'registration_number' => ['required'],
+            'employee_number' => ['required'],
             'hired_at' => ['required', 'date'],
-            'active' => ['required', 'boolean'],
+            'is_active' => ['required', 'boolean'],
             'work_schedule_id' => ['required', 'exists:work_schedules,id'],
             'position' => ['required', 'string'],
         ]);
 
         $employee = Employee::create($validated);
 
-        return response()->json($employee, 201);
+        return new EmployeeResource($employee);
     }
 
     /**
@@ -42,7 +43,7 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
-        return response()->json($employee->load(['user', 'workSchedule']));
+        return new EmployeeResource($employee->load(['user', 'workSchedule']));
     }
 
     /**
@@ -53,16 +54,16 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'name' => ['sometimes', 'string'],
             'cpf' => ['sometimes', 'string'],
-            'registration_number' => ['sometimes'],
+            'employee_number' => ['sometimes'],
             'hired_at' => ['sometimes', 'date'],
-            'active' => ['sometimes', 'boolean'],
+            'is_active' => ['sometimes', 'boolean'],
             'work_schedule_id' => ['sometimes', 'exists:work_schedules,id'],
             'position' => ['sometimes', 'string'],
         ]);
 
         $employee->update($validated);
 
-        return response()->json($employee);
+        return new EmployeeResource($employee->load(['user', 'workSchedule']));
     }
 
     /**
