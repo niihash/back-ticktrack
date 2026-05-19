@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\NotificationResource;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,9 +12,9 @@ class NotificationController extends Controller
 {
     public function index()
     {
-        $notifications = Auth::user()->notifications()->latest()->paginate();
+        $notifications = Auth::user()->notifications()->latest();
 
-        return response()->json($notifications);
+        return NotificationResource::collection($notifications);
     }
 
     public function show(Notification $notification)
@@ -22,7 +23,7 @@ class NotificationController extends Controller
 
         abort_unless($user->notifications()->where('notifications.id', $notification->id)->exists(), 403);
 
-        return response()->json($notification);
+        return new NotificationResource($notification);
     }
 
     public function markAsRead(Notification $notification)
