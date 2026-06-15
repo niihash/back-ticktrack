@@ -30,7 +30,7 @@ class TimeEntryController extends Controller
             $query->whereDate('recorded_at', '<=', $request->end_date);
         }
 
-        return TimeEntryResource::collection($query->orderBy('record_at', 'desc'));
+        return TimeEntryResource::collection($query->orderBy('recorded_at', 'desc')->get());
     }
 
     /**
